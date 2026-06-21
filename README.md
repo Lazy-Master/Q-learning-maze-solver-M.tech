@@ -1,83 +1,88 @@
 # Q-Learning Maze Solver
 
-A compact reinforcement learning project where a Q-learning agent learns to navigate a maze, balance exploration with exploitation, and expose its policy through a simple Pygame visualizer.
+Reinforcement learning project comparing four maze-solving algorithms: Q-Learning, SARSA, Boltzmann Q-Learning, and Ant Colony Optimization.
 
-## Highlights
-- Grid-based maze environment with rewards and penalties
-- Tabular Q-learning agent with epsilon-greedy exploration
-- Command-line training flow for fast experiments
-- Pygame visualizer for training, solving, and policy inspection
-- Example scripts and unit tests for the environment and agent
+## Algorithms
 
-## Learning Loop
-```mermaid
-flowchart LR
-    A["Reset maze"] --> B["Choose action with epsilon-greedy policy"]
-    B --> C["Move in maze and receive reward"]
-    C --> D["Update Q-value"]
-    D --> E["Decay epsilon after each episode"]
-    E --> B
+| Algorithm | Type | Exploration Strategy |
+|-----------|------|---------------------|
+| Q-Learning | Off-policy TD control | ε-greedy |
+| SARSA | On-policy TD control | ε-greedy |
+| Boltzmann Q-Learning | Off-policy TD control | Softmax (temperature-based) |
+| Ant Colony Optimization | Swarm intelligence | Pheromone-guided probabilistic |
+
+## Features
+
+- Grid-based maze environment with configurable walls, start, and goal positions
+- Tabular Q-learning agent with ε-greedy exploration
+- SARSA agent for on-policy comparison
+- Boltzmann exploration agent with temperature parameter control
+- Ant Colony Optimization using pheromone trails and heuristic guidance
+- Matplotlib animation for path visualization
+- Sensitivity analysis across hyperparameters (γ, τ, ρ)
+- Generalization testing on different maze topologies
+
+## Methodology
+
+### Reinforcement Learning Agents
+
+**Q-Learning** updates Q-values using the maximum expected future reward:
+```
+Q(s,a) += α * (r + γ * max Q(s',a') - Q(s,a))
 ```
 
-## Project Layout
-```text
+**SARSA** updates Q-values using the actual next action taken:
+```
+Q(s,a) += α * (r + γ * Q(s',a') - Q(s,a))
+```
+
+**Boltzmann Q-Learning** replaces ε-greedy with softmax action selection:
+```
+P(a) = exp(Q(s,a)/τ) / Σ exp(Q(s,a')/τ)
+```
+
+**Ant Colony Optimization** uses pheromone deposits proportional to path quality:
+```
+τ(i,j) += Q/path_length for successful paths
+τ(i,j) *= (1 - ρ) for evaporation
+```
+
+### Sensitivity Analysis
+
+Tested parameter sweeps:
+- **Discount factor (γ):** [0.1, 0.5, 0.9, 0.99]
+- **Boltzmann temperature (τ):** [0.1, 0.5, 1.0, 2.0, 5.0]
+- **ACO evaporation rate (ρ):** [0.05, 0.1, 0.3, 0.5]
+
+### Generalization
+
+Both 5×5 and 3×7 bridge maze topologies used to test algorithm adaptability.
+
+## Project Structure
+
+```
 Q-learning-maze-solver/
-|-- src/
-|   |-- maze.py
-|   |-- qlearning.py
-|   `-- gui.py
-|-- examples/
-|   |-- example_usage.py
-|   `-- run_gui.py
-|-- tests/
-|   |-- test_maze.py
-|   `-- test_qlearning.py
-|-- requirements.txt
-|-- .gitignore
-|-- LICENSE
-`-- README.md
+├── Q_Learning_Maze_Solver.ipynb   # Main notebook
+├── requirements.txt
+├── LICENSE
+└── README.md
 ```
 
-## Quickstart
-1. Create a virtual environment if you want an isolated setup.
-2. Install the core dependency:
-   ```sh
-   python -m pip install -r requirements.txt
-   ```
-3. Optional GUI support:
-   ```sh
-   python -m pip install pygame
-   ```
+## Requirements
 
-## Run The Project
-Train from the command line:
-```sh
-python src/qlearning.py
+```
+numpy
+matplotlib
+seaborn
 ```
 
-Launch the GUI visualizer:
-```sh
-python examples/run_gui.py
+## Usage
+
+```bash
+pip install -r requirements.txt
+jupyter notebook Q_Learning_Maze_Solver.ipynb
 ```
 
-Run the tests:
-```sh
-python -m unittest discover -s tests
-```
+## License
 
-## Reward Design
-- Reach goal: `+100`
-- Hit wall or boundary: `-10`
-- Take a normal step: `-1`
-
-## GUI Controls
-- `T`: train in real time
-- `S`: solve with the learned policy
-- `W`: inspect the current policy
-- `R`: reset the session
-- `Q`: quit
-
-## Extension Ideas
-- Support larger custom mazes
-- Add policy heatmaps or reward charts
-- Compare Q-learning hyperparameters side by side
+MIT
